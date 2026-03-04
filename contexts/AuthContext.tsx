@@ -45,7 +45,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: '1',
       name: 'Usuário Demo',
       email,
-      avatar: 'https://i.pravatar.cc/150?img=1',
     };
     await AsyncStorage.setItem('user', JSON.stringify(mockUser));
     setUser(mockUser);
@@ -56,7 +55,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: '2',
       name: 'Usuário Google',
       email: 'usuario@gmail.com',
-      avatar: 'https://i.pravatar.cc/150?img=2',
     };
     await AsyncStorage.setItem('user', JSON.stringify(mockUser));
     setUser(mockUser);
@@ -67,7 +65,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: '3',
       name,
       email,
-      avatar: 'https://i.pravatar.cc/150?img=3',
     };
     await AsyncStorage.setItem('user', JSON.stringify(mockUser));
     setUser(mockUser);

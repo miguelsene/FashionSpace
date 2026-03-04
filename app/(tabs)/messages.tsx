@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/theme';
@@ -11,7 +11,6 @@ const MOCK_MESSAGES = [
     lastMessage: 'Obrigado pelo interesse!',
     time: '10:30',
     unread: 2,
-    avatar: 'https://i.pravatar.cc/150?img=10',
   },
   {
     id: '2',
@@ -19,7 +18,6 @@ const MOCK_MESSAGES = [
     lastMessage: 'Produto disponível',
     time: 'Ontem',
     unread: 0,
-    avatar: 'https://i.pravatar.cc/150?img=11',
   },
   {
     id: '3',
@@ -27,7 +25,6 @@ const MOCK_MESSAGES = [
     lastMessage: 'Quando pode retirar?',
     time: '2 dias',
     unread: 1,
-    avatar: 'https://i.pravatar.cc/150?img=12',
   },
 ];
 
@@ -44,7 +41,9 @@ export default function MessagesScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {MOCK_MESSAGES.map(message => (
           <TouchableOpacity key={message.id} style={styles.messageItem}>
-            <Image source={{ uri: message.avatar }} style={styles.avatar} />
+            <View style={styles.avatarContainer}>
+              <Ionicons name="help-circle" size={40} color={Colors.light.border} />
+            </View>
             <View style={styles.messageContent}>
               <View style={styles.messageHeader}>
                 <Text style={styles.name}>{message.name}</Text>
@@ -98,10 +97,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.light.border,
   },
-  avatar: {
+  avatarContainer: {
     width: 56,
     height: 56,
     borderRadius: 28,
+    backgroundColor: Colors.light.card,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 12,
   },
   messageContent: {

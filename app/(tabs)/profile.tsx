@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/theme';
@@ -19,10 +19,9 @@ export default function ProfileScreen() {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.profileSection}>
-          <Image 
-            source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?img=1' }} 
-            style={styles.avatar} 
-          />
+          <View style={styles.avatarContainer}>
+            <Ionicons name="help-circle" size={80} color={Colors.light.border} />
+          </View>
           <Text style={styles.name}>{user?.name}</Text>
           <Text style={styles.email}>{user?.email}</Text>
           
@@ -123,10 +122,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginBottom: 16,
   },
-  avatar: {
+  avatarContainer: {
     width: 100,
     height: 100,
     borderRadius: 50,
+    backgroundColor: Colors.light.card,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 16,
   },
   name: {
