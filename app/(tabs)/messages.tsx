@@ -2,7 +2,9 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/theme';
+import { useRouter } from 'expo-router';
+import { useTheme } from '@/contexts/ThemeContext';
+import { BlurView } from 'expo-blur';
 
 const MOCK_MESSAGES = [
   {
@@ -29,48 +31,61 @@ const MOCK_MESSAGES = [
 ];
 
 export default function MessagesScreen() {
+  const router = useRouter();
+  const { isDark } = useTheme();
+  
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Mensagens</Text>
-        <TouchableOpacity>
-          <Ionicons name="create-outline" size={24} color={Colors.light.primary} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {MOCK_MESSAGES.map(message => (
-          <TouchableOpacity key={message.id} style={styles.messageItem}>
-            <View style={styles.avatarContainer}>
-              <Ionicons name="help-circle" size={40} color={Colors.light.border} />
-            </View>
-            <View style={styles.messageContent}>
-              <View style={styles.messageHeader}>
-                <Text style={styles.name}>{message.name}</Text>
-                <Text style={styles.time}>{message.time}</Text>
-              </View>
-              <View style={styles.messageFooter}>
-                <Text style={styles.lastMessage} numberOfLines={1}>
-                  {message.lastMessage}
-                </Text>
-                {message.unread > 0 && (
-                  <View style={styles.unreadBadge}>
-                    <Text style={styles.unreadText}>{message.unread}</Text>
-                  </View>
-                )}
-              </View>
-            </View>
+    <View style={[styles.container, { backgroundColor: isDark ? '#0a1929' : '#f4eddc' }]}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <BlurView intensity={80} tint={isDark ? 'dark' : 'light'} style={styles.header}>
+          <Text style={[styles.headerTitle, { color: isDark ? '#f4eddc' : '#000' }]}>Mensagens</Text>
+          <TouchableOpacity>
+            <Ionicons name="create-outline" size={24} color="#5f81a5" />
           </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </SafeAreaView>
+        </BlurView>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {MOCK_MESSAGES.map(message => (
+            <TouchableOpacity 
+              key={message.id} 
+              style={styles.messageItem}
+              onPress={() => router.push(`/chat/${message.id}`)}
+            >
+              <BlurView intensity={60} tint={isDark ? 'dark' : 'light'} style={styles.messageCard}>
+                <View style={styles.avatarContainer}>
+                  <Ionicons name="help-circle" size={40} color="#5f81a5" />
+                </View>
+                <View style={styles.messageContent}>
+                  <View style={styles.messageHeader}>
+                    <Text style={[styles.name, { color: isDark ? '#f4eddc' : '#000' }]}>{message.name}</Text>
+                    <Text style={[styles.time, { color: '#5f81a5' }]}>{message.time}</Text>
+                  </View>
+                  <View style={styles.messageFooter}>
+                    <Text style={[styles.lastMessage, { color: '#5f81a5' }]} numberOfLines={1}>
+                      {message.lastMessage}
+                    </Text>
+                    {message.unread > 0 && (
+                      <View style={styles.unreadBadge}>
+                        <Text style={styles.unreadText}>{message.unread}</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              </BlurView>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+  },
+  safeArea: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
@@ -78,30 +93,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.light.border,
+    borderBottomColor: 'rgba(95, 129, 165, 0.2)',
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: Colors.light.text,
   },
   content: {
     flex: 1,
+    padding: 16,
   },
   messageItem: {
+    marginBottom: 12,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  messageCard: {
     flexDirection: 'row',
     padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.light.border,
   },
   avatarContainer: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Colors.light.card,
+    backgroundColor: 'rgba(95, 129, 165, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -118,11 +134,9 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.light.text,
   },
   time: {
     fontSize: 12,
-    color: Colors.light.icon,
   },
   messageFooter: {
     flexDirection: 'row',
@@ -132,10 +146,9 @@ const styles = StyleSheet.create({
   lastMessage: {
     flex: 1,
     fontSize: 14,
-    color: Colors.light.icon,
   },
   unreadBadge: {
-    backgroundColor: Colors.light.primary,
+    backgroundColor: '#FF6B9D',
     borderRadius: 12,
     minWidth: 24,
     height: 24,

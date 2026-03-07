@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useRouter } from 'expo-router';
+import { BlurView } from 'expo-blur';
 
 interface SidebarProps {
   visible: boolean;
@@ -12,12 +13,19 @@ interface SidebarProps {
 
 export default function Sidebar({ visible, onClose }: SidebarProps) {
   const { logout } = useAuth();
+  const { isDark } = useTheme();
   const router = useRouter();
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     onClose();
     router.replace('/login');
+  };
+
+  const handleSettings = () => {
+    onClose();
+    router.push('/(tabs)/profile');
   };
 
   return (
@@ -27,27 +35,31 @@ export default function Sidebar({ visible, onClose }: SidebarProps) {
       transparent
       onRequestClose={onClose}
     >
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
-        <View style={styles.sidebar}>
+      <View style={styles.overlay}>
+        <BlurView 
+          intensity={80} 
+          tint={isDark ? 'dark' : 'light'} 
+          style={[styles.sidebar, { backgroundColor: isDark ? 'rgba(15, 44, 71, 0.95)' : 'rgba(255, 255, 255, 0.95)' }]}
+        >
           <SafeAreaView style={styles.content}>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <Ionicons name="close" size={28} color={Colors.light.text} />
+              <Ionicons name="close" size={28} color={isDark ? '#f4eddc' : '#000'} />
             </TouchableOpacity>
 
             <View style={styles.menu}>
               <TouchableOpacity style={styles.menuItem}>
-                <Ionicons name="help-circle-outline" size={24} color={Colors.light.primary} />
-                <Text style={styles.menuText}>Ajuda</Text>
+                <Ionicons name="help-circle-outline" size={24} color="#5f81a5" />
+                <Text style={[styles.menuText, { color: isDark ? '#f4eddc' : '#000' }]}>Ajuda</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.menuItem} onPress={handleSettings}>
+                <Ionicons name="settings-outline" size={24} color="#5f81a5" />
+                <Text style={[styles.menuText, { color: isDark ? '#f4eddc' : '#000' }]}>Configurações</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.menuItem}>
-                <Ionicons name="settings-outline" size={24} color={Colors.light.primary} />
-                <Text style={styles.menuText}>Configurações</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.menuItem}>
-                <Ionicons name="information-circle-outline" size={24} color={Colors.light.primary} />
-                <Text style={styles.menuText}>Sobre</Text>
+                <Ionicons name="information-circle-outline" size={24} color="#5f81a5" />
+                <Text style={[styles.menuText, { color: isDark ? '#f4eddc' : '#000' }]}>Sobre</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={[styles.menuItem, styles.logoutItem]} onPress={handleLogout}>
@@ -56,8 +68,13 @@ export default function Sidebar({ visible, onClose }: SidebarProps) {
               </TouchableOpacity>
             </View>
           </SafeAreaView>
-        </View>
-      </TouchableOpacity>
+        </BlurView>
+        <TouchableOpacity 
+          style={styles.overlayTouchable} 
+          activeOpacity={1} 
+          onPress={onClose}
+        />
+      </View>
     </Modal>
   );
 }
@@ -65,18 +82,20 @@ export default function Sidebar({ visible, onClose }: SidebarProps) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
+    flexDirection: 'row',
     backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-start',
   },
   sidebar: {
     width: '75%',
     height: '100%',
-    backgroundColor: '#fff',
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 0 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  overlayTouchable: {
+    flex: 1,
   },
   content: {
     flex: 1,
@@ -100,7 +119,6 @@ const styles = StyleSheet.create({
   menuText: {
     fontSize: 16,
     marginLeft: 16,
-    color: Colors.light.text,
     fontWeight: '500',
   },
   logoutItem: {
