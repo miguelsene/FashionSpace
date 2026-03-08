@@ -1,18 +1,13 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import BazarCard from '@/components/BazarCard';
 import WaveBackground from '@/components/animated/WaveBackground';
-
-const ALL_BAZARES = [
-  { id: '1', name: 'Bazar da Moda', description: 'Roupas vintage e acessórios exclusivos', image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800', rating: 4.8, location: 'São Paulo, SP' },
-  { id: '2', name: 'Estilo Único', description: 'Peças artesanais e decoração', image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800', rating: 4.5, location: 'Rio de Janeiro, RJ' },
-  { id: '3', name: 'Fashion Space', description: 'Moda sustentável e consciente', image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=800', rating: 4.9, location: 'Belo Horizonte, MG' },
-  { id: '4', name: 'Brechó Chic', description: 'Roupas de marca com preços acessíveis', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800', rating: 4.7, location: 'Curitiba, PR' },
-];
+import { BlurView } from 'expo-blur';
+import { ALL_BAZARES } from '@/constants/bazares';
 
 export default function FavoritesScreen() {
   const { isDark } = useTheme();
@@ -25,23 +20,32 @@ export default function FavoritesScreen() {
       <WaveBackground />
       
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <View style={[styles.header, { backgroundColor: isDark ? 'rgba(15, 44, 71, 0.9)' : 'rgba(255, 255, 255, 0.9)' }]}>
+        <BlurView intensity={80} tint={isDark ? 'dark' : 'light'} style={styles.header}>
           <Text style={[styles.headerTitle, { color: isDark ? '#f4eddc' : '#000' }]}>Favoritos</Text>
-        </View>
+          <Text style={[styles.headerSubtitle, { color: '#5f81a5' }]}>{favorites.length} bazares</Text>
+        </BlurView>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {favoriteBazares.length > 0 ? (
-            favoriteBazares.map(bazar => (
-              <BazarCard key={bazar.id} {...bazar} isFavorite={true} />
-            ))
-          ) : (
-            <View style={styles.emptyState}>
-              <Ionicons name="heart-outline" size={80} color="rgba(95, 129, 165, 0.5)" />
-              <Text style={[styles.emptyText, { color: isDark ? '#f4eddc' : '#000' }]}>Nenhum favorito ainda</Text>
-              <Text style={[styles.emptySubtext, { color: '#5f81a5' }]}>Adicione bazares aos seus favoritos</Text>
-            </View>
-          )}
-        </ScrollView>
+        {favoriteBazares.length > 0 ? (
+          <FlatList
+            data={favoriteBazares}
+            numColumns={2}
+            columnWrapperStyle={styles.row}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <View style={styles.cardWrapper}>
+                <BazarCard {...item} />
+              </View>
+            )}
+            keyExtractor={item => item.id}
+          />
+        ) : (
+          <View style={styles.emptyState}>
+            <Ionicons name="heart-outline" size={80} color="rgba(95, 129, 165, 0.5)" />
+            <Text style={[styles.emptyText, { color: isDark ? '#f4eddc' : '#000' }]}>Nenhum favorito ainda</Text>
+            <Text style={[styles.emptySubtext, { color: '#5f81a5' }]}>Adicione bazares aos seus favoritos</Text>
+          </View>
+        )}
       </SafeAreaView>
     </View>
   );
@@ -64,9 +68,21 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
   },
+  headerSubtitle: {
+    fontSize: 14,
+    marginTop: 4,
+  },
   content: {
+    padding: 8,
+  },
+  row: {
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+  },
+  cardWrapper: {
     flex: 1,
-    padding: 16,
+    maxWidth: '48%',
+    marginHorizontal: 4,
   },
   emptyState: {
     flex: 1,

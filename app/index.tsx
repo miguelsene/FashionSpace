@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Redirect, useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
+import LoadingScreen from '@/components/LoadingScreen';
 
 export default function Index() {
   const { user, isLoading } = useAuth();
@@ -15,6 +16,10 @@ export default function Index() {
       }
     }
   }, [user, isLoading]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return null;
 }

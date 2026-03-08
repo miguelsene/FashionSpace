@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/theme';
@@ -19,19 +19,19 @@ interface BazarCardProps {
   onFavorite?: () => void;
 }
 
-export default function BazarCard({ id, name, description, image, rating, location }: BazarCardProps) {
+const BazarCard = memo(({ id, name, description, image, rating, location }: BazarCardProps) => {
   const { isDark } = useTheme();
   const { isFavorite, toggleFavorite } = useFavorites();
   const router = useRouter();
 
   return (
     <TouchableOpacity style={styles.card} onPress={() => router.push(`/bazar/${id}`)}>
-      <Image source={{ uri: image }} style={styles.image} />
+      <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
       <TouchableOpacity style={styles.favoriteButton} onPress={() => toggleFavorite(id)}>
         <Ionicons name={isFavorite(id) ? 'heart' : 'heart-outline'} size={24} color="#FF6B9D" />
       </TouchableOpacity>
       
-      <BlurView intensity={60} tint={isDark ? 'dark' : 'light'} style={styles.content}>
+      <View style={[styles.content, { backgroundColor: isDark ? 'rgba(15, 44, 71, 0.8)' : 'rgba(244, 237, 220, 0.8)' }]}>
         <Text style={[styles.name, { color: isDark ? '#f4eddc' : '#000' }]}>{name}</Text>
         <Text style={[styles.description, { color: '#5f81a5' }]} numberOfLines={2}>{description}</Text>
         
@@ -42,21 +42,21 @@ export default function BazarCard({ id, name, description, image, rating, locati
           </View>
           <View style={styles.location}>
             <Ionicons name="location-outline" size={16} color="#5f81a5" />
-            <Text style={[styles.locationText, { color: '#5f81a5' }]}>{location}</Text>
+            <Text style={[styles.locationText, { color: '#5f81a5' }]} numberOfLines={1}>{location}</Text>
           </View>
         </View>
-      </BlurView>
+      </View>
     </TouchableOpacity>
   );
-}
+});
+
+export default BazarCard;
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 16,
+    borderRadius: 20,
     marginBottom: 16,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(95, 129, 165, 0.3)',
     backgroundColor: 'transparent',
   },
   image: {

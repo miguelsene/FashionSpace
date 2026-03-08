@@ -35,72 +35,76 @@ export default function ChatScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: isDark ? '#0a1929' : '#f4eddc' }]} edges={['top', 'bottom']}>
-      <BlurView intensity={80} tint={isDark ? 'dark' : 'light'} style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={isDark ? '#f4eddc' : '#000'} />
-        </TouchableOpacity>
-        <View style={styles.headerInfo}>
-          <Ionicons name="help-circle" size={40} color="#5f81a5" />
-          <Text style={[styles.headerName, { color: isDark ? '#f4eddc' : '#000' }]}>{chat.name}</Text>
-        </View>
-        <View style={{ width: 24 }} />
-      </BlurView>
-
-      <KeyboardAvoidingView 
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={0}
-      >
-        <FlatList
-          data={messages}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.messagesList}
-          renderItem={({ item }) => (
-            <View style={[
-              styles.messageItem,
-              item.sender === 'me' ? styles.myMessage : styles.otherMessage
-            ]}>
-              <BlurView
-                intensity={item.sender === 'me' ? 100 : 60}
-                tint={item.sender === 'me' ? 'dark' : (isDark ? 'dark' : 'light')}
-                style={[
-                  styles.messageBubble,
-                  item.sender === 'me' && { backgroundColor: 'rgba(15, 44, 71, 0.9)' }
-                ]}
-              >
-                <Text style={[
-                  styles.messageText,
-                  { color: item.sender === 'me' ? '#fff' : (isDark ? '#f4eddc' : '#000') }
-                ]}>
-                  {item.text}
-                </Text>
-                <Text style={[
-                  styles.messageTime,
-                  { color: item.sender === 'me' ? 'rgba(255,255,255,0.7)' : '#5f81a5' }
-                ]}>
-                  {item.time}
-                </Text>
-              </BlurView>
-            </View>
-          )}
-        />
-
-        <BlurView intensity={80} tint={isDark ? 'dark' : 'light'} style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, { color: isDark ? '#f4eddc' : '#000' }]}
-            placeholder="Digite uma mensagem..."
-            placeholderTextColor="#5f81a5"
-            value={message}
-            onChangeText={setMessage}
-            multiline
-          />
-          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-            <Ionicons name="send" size={24} color="#fff" />
+    <View style={[styles.container, { backgroundColor: isDark ? '#0a1929' : '#f4eddc' }]}>
+      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+        <BlurView intensity={80} tint={isDark ? 'dark' : 'light'} style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color={isDark ? '#f4eddc' : '#000'} />
           </TouchableOpacity>
+          <View style={styles.headerInfo}>
+            <Ionicons name="help-circle" size={40} color="#5f81a5" />
+            <Text style={[styles.headerName, { color: isDark ? '#f4eddc' : '#000' }]}>{chat.name}</Text>
+          </View>
+          <View style={{ width: 24 }} />
         </BlurView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+
+        <KeyboardAvoidingView 
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
+          <FlatList
+            data={messages}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.messagesList}
+            inverted={false}
+            renderItem={({ item }) => (
+              <View style={[
+                styles.messageItem,
+                item.sender === 'me' ? styles.myMessage : styles.otherMessage
+              ]}>
+                <BlurView
+                  intensity={item.sender === 'me' ? 100 : 60}
+                  tint={item.sender === 'me' ? 'dark' : (isDark ? 'dark' : 'light')}
+                  style={[
+                    styles.messageBubble,
+                    item.sender === 'me' && { backgroundColor: 'rgba(15, 44, 71, 0.9)' }
+                  ]}
+                >
+                  <Text style={[
+                    styles.messageText,
+                    { color: item.sender === 'me' ? '#fff' : (isDark ? '#f4eddc' : '#000') }
+                  ]}>
+                    {item.text}
+                  </Text>
+                  <Text style={[
+                    styles.messageTime,
+                    { color: item.sender === 'me' ? 'rgba(255,255,255,0.7)' : '#5f81a5' }
+                  ]}>
+                    {item.time}
+                  </Text>
+                </BlurView>
+              </View>
+            )}
+          />
+
+          <BlurView intensity={80} tint={isDark ? 'dark' : 'light'} style={styles.inputContainer}>
+            <TextInput
+              style={[styles.input, { color: isDark ? '#f4eddc' : '#000' }]}
+              placeholder="Digite uma mensagem..."
+              placeholderTextColor="#5f81a5"
+              value={message}
+              onChangeText={setMessage}
+              multiline
+              maxLength={500}
+            />
+            <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+              <Ionicons name="send" size={24} color="#fff" />
+            </TouchableOpacity>
+          </BlurView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 

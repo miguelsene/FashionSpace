@@ -1,28 +1,72 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
+import Svg, { Path } from 'react-native-svg';
+import Animated, { useSharedValue, useAnimatedProps, withRepeat, withTiming, Easing } from 'react-native-reanimated';
 import { useTheme } from '@/contexts/ThemeContext';
+
+const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 export default function WaveBackground() {
   const { isDark } = useTheme();
-  const translateX = useSharedValue(0);
+  const wave1 = useSharedValue(0);
+  const wave2 = useSharedValue(0);
+  const wave3 = useSharedValue(0);
 
   useEffect(() => {
-    translateX.value = withRepeat(
-      withTiming(100, { duration: 3000, easing: Easing.linear }),
+    wave1.value = withRepeat(
+      withTiming(1, { duration: 4000, easing: Easing.inOut(Easing.ease) }),
       -1,
-      false
+      true
+    );
+    wave2.value = withRepeat(
+      withTiming(1, { duration: 5000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
+    );
+    wave3.value = withRepeat(
+      withTiming(1, { duration: 6000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true
     );
   }, []);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-  }));
+  const animatedProps1 = useAnimatedProps(() => {
+    const y = 300 + wave1.value * 20;
+    return {
+      d: `M0,${y} Q100,${y - 20} 200,${y} T400,${y} V800 H0 Z`,
+    };
+  });
+
+  const animatedProps2 = useAnimatedProps(() => {
+    const y = 350 + wave2.value * 15;
+    return {
+      d: `M0,${y} Q100,${y + 15} 200,${y} T400,${y} V800 H0 Z`,
+    };
+  });
+
+  const animatedProps3 = useAnimatedProps(() => {
+    const y = 400 + wave3.value * 10;
+    return {
+      d: `M0,${y} Q100,${y - 10} 200,${y} T400,${y} V800 H0 Z`,
+    };
+  });
 
   return (
     <View style={[styles.container, { backgroundColor: isDark ? '#0a1929' : '#f4eddc' }]}>
-      <Animated.View style={[styles.wave, animatedStyle, { backgroundColor: isDark ? '#0f2c47' : '#5f81a5' }]} />
-      <Animated.View style={[styles.wave2, animatedStyle, { backgroundColor: isDark ? '#1a3a5a' : '#0f2c47' }]} />
+      <Svg height="100%" width="100%" style={styles.svg}>
+        <AnimatedPath
+          animatedProps={animatedProps1}
+          fill={isDark ? 'rgba(15, 44, 71, 0.3)' : 'rgba(95, 129, 165, 0.15)'}
+        />
+        <AnimatedPath
+          animatedProps={animatedProps2}
+          fill={isDark ? 'rgba(26, 58, 90, 0.25)' : 'rgba(15, 44, 71, 0.1)'}
+        />
+        <AnimatedPath
+          animatedProps={animatedProps3}
+          fill={isDark ? 'rgba(95, 129, 165, 0.2)' : 'rgba(95, 129, 165, 0.08)'}
+        />
+      </Svg>
     </View>
   );
 }
@@ -30,20 +74,9 @@ export default function WaveBackground() {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
   },
-  wave: {
+  svg: {
     position: 'absolute',
-    width: '200%',
-    height: 3,
-    top: '20%',
-    opacity: 0.3,
-  },
-  wave2: {
-    position: 'absolute',
-    width: '200%',
-    height: 2,
-    top: '40%',
-    opacity: 0.2,
+    bottom: 0,
   },
 });

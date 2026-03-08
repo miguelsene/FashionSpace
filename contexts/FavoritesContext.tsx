@@ -17,8 +17,12 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   const loadFavorites = async () => {
-    const data = await AsyncStorage.getItem('favorites');
-    if (data) setFavorites(JSON.parse(data));
+    try {
+      const data = await AsyncStorage.getItem('favorites');
+      if (data) setFavorites(JSON.parse(data));
+    } catch (error) {
+      console.log('Error loading favorites');
+    }
   };
 
   const toggleFavorite = async (id: string) => {
@@ -26,7 +30,11 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       ? favorites.filter(fav => fav !== id)
       : [...favorites, id];
     setFavorites(newFavorites);
-    await AsyncStorage.setItem('favorites', JSON.stringify(newFavorites));
+    try {
+      await AsyncStorage.setItem('favorites', JSON.stringify(newFavorites));
+    } catch (error) {
+      console.log('Error saving favorites');
+    }
   };
 
   const isFavorite = (id: string) => favorites.includes(id);

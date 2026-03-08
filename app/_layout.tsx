@@ -24,6 +24,7 @@ export default function RootLayout() {
               <Stack.Screen name="bazar/[id]" />
               <Stack.Screen name="chat/[id]" />
               <Stack.Screen name="all-bazares" />
+              <Stack.Screen name="map" />
               <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
             </Stack>
             <StatusBar style="auto" />

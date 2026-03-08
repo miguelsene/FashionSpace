@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Linking, FlatList, Dimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Linking, FlatList, Dimensions, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -55,6 +55,18 @@ export default function BazarDetailScreen() {
     router.push(`/chat/${id}`);
   };
 
+  const handleShare = async () => {
+    try {
+      const bazarUrl = `fashionspace://bazar/${id}`;
+      await Share.share({
+        message: `Confira o ${bazar.name}! ${bazar.description}\n${bazar.location}\n\nVeja mais em: ${bazarUrl}`,
+        title: bazar.name,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: isDark ? '#0a1929' : '#f4eddc' }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -79,9 +91,14 @@ export default function BazarDetailScreen() {
               <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                 <Ionicons name="arrow-back" size={24} color="#fff" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.favoriteButton} onPress={() => toggleFavorite(id as string)}>
-                <Ionicons name={isFavorite(id as string) ? 'heart' : 'heart-outline'} size={24} color="#FF6B9D" />
-              </TouchableOpacity>
+              <View style={styles.rightActions}>
+                <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+                  <Ionicons name="share-outline" size={24} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.favoriteButton} onPress={() => toggleFavorite(id as string)}>
+                  <Ionicons name={isFavorite(id as string) ? 'heart' : 'heart-outline'} size={24} color="#FF6B9D" />
+                </TouchableOpacity>
+              </View>
             </View>
           </SafeAreaView>
 
@@ -197,6 +214,15 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   backButton: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  rightActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  shareButton: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 20,
     padding: 8,

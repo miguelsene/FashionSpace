@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, SafeAreaView, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -31,16 +31,26 @@ export default function Sidebar({ visible, onClose }: SidebarProps) {
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType="none"
       transparent
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <BlurView 
-          intensity={80} 
-          tint={isDark ? 'dark' : 'light'} 
-          style={[styles.sidebar, { backgroundColor: isDark ? 'rgba(15, 44, 71, 0.95)' : 'rgba(255, 255, 255, 0.95)' }]}
+        <Animated.View 
+          style={[
+            styles.sidebarWrapper,
+            {
+              transform: [{
+                translateX: visible ? 0 : -300
+              }]
+            }
+          ]}
         >
+          <BlurView 
+            intensity={80} 
+            tint={isDark ? 'dark' : 'light'} 
+            style={[styles.sidebar, { backgroundColor: isDark ? 'rgba(15, 44, 71, 0.95)' : 'rgba(255, 255, 255, 0.95)' }]}
+          >
           <SafeAreaView style={styles.content}>
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <Ionicons name="close" size={28} color={isDark ? '#f4eddc' : '#000'} />
@@ -69,6 +79,7 @@ export default function Sidebar({ visible, onClose }: SidebarProps) {
             </View>
           </SafeAreaView>
         </BlurView>
+        </Animated.View>
         <TouchableOpacity 
           style={styles.overlayTouchable} 
           activeOpacity={1} 
@@ -85,9 +96,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
-  sidebar: {
+  sidebarWrapper: {
     width: '75%',
     height: '100%',
+  },
+  sidebar: {
+    flex: 1,
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 0 },
     shadowOpacity: 0.25,

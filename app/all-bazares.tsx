@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -7,19 +7,31 @@ import { useTheme } from '@/contexts/ThemeContext';
 import BazarCard from '@/components/BazarCard';
 import WaveBackground from '@/components/animated/WaveBackground';
 import { BlurView } from 'expo-blur';
+import { ALL_BAZARES } from '@/constants/bazares';
 
-const ALL_BAZARES = [
-  { id: '1', name: 'Bazar da Moda', description: 'Roupas vintage e acessórios exclusivos', image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800', rating: 4.8, location: 'São Paulo, SP' },
-  { id: '2', name: 'Estilo Único', description: 'Peças artesanais e decoração', image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800', rating: 4.5, location: 'Rio de Janeiro, RJ' },
-  { id: '3', name: 'Fashion Space', description: 'Moda sustentável e consciente', image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=800', rating: 4.9, location: 'Belo Horizonte, MG' },
-  { id: '4', name: 'Brechó Chic', description: 'Roupas de marca com preços acessíveis', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800', rating: 4.7, location: 'Curitiba, PR' },
-  { id: '5', name: 'Arte & Estilo', description: 'Artesanato e peças únicas', image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800', rating: 4.6, location: 'Porto Alegre, RS' },
-  { id: '6', name: 'Vintage Store', description: 'Antiguidades e colecionáveis', image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800', rating: 4.4, location: 'Salvador, BA' },
+const FILTERS = [
+  { id: 'todos', label: 'Todos' },
+  { id: 'moda', label: 'Moda' },
+  { id: 'artesanato', label: 'Artesanato' },
+  { id: 'vintage', label: 'Vintage' },
+  { id: 'decoracao', label: 'Decoração' },
 ];
 
 export default function AllBazaresScreen() {
   const router = useRouter();
   const { isDark } = useTheme();
+  const [selectedFilter, setSelectedFilter] = useState('todos');
+
+  const filteredBazares = useMemo(() => {
+    if (selectedFilter === 'todos') return ALL_BAZARES;
+    return ALL_BAZARES.filter(bazar => bazar.category === selectedFilter);
+  }, [selectedFilter]);
+
+  const renderItem = useCallback(({ item }: { item: typeof ALL_BAZARES[0] }) => (
+    <View style={styles.cardWrapper}>
+      <BazarCard {...item} />
+    </View>
+  ), []);
 
   return (
     <View style={styles.container}>
@@ -34,18 +46,47 @@ export default function AllBazaresScreen() {
           <View style={{ width: 28 }} />
         </BlurView>
 
+        <View style={styles.filtersContainer}>
+          <FlatList
+            horizontal
+            data={FILTERS}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filtersList}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => setSelectedFilter(item.id)}>
+                <BlurView
+                  intensity={selectedFilter === item.id ? 60 : 40}
+                  tint={isDark ? 'dark' : 'light'}
+                  style={[
+                    styles.filterChip,
+                    selectedFilter === item.id && styles.filterChipActive
+                  ]}
+                >
+                  <Text style={[
+                    styles.filterText,
+                    { color: selectedFilter === item.id ? '#0f2c47' : (isDark ? '#f4eddc' : '#000') }
+                  ]}>
+                    {item.label}
+                  </Text>
+                </BlurView>
+              </TouchableOpacity>
+            )}
+            keyExtractor={item => item.id}
+          />
+        </View>
+
         <FlatList
-          data={ALL_BAZARES}
+          data={filteredBazares}
           numColumns={2}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <View style={styles.cardWrapper}>
-              <BazarCard {...item} />
-            </View>
-          )}
+          renderItem={renderItem}
           keyExtractor={item => item.id}
+          maxToRenderPerBatch={6}
+          windowSize={5}
+          removeClippedSubviews={true}
+          initialNumToRender={6}
         />
       </SafeAreaView>
     </View>
@@ -71,6 +112,28 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  filtersContainer: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(95, 129, 165, 0.2)',
+  },
+  filtersList: {
+    paddingHorizontal: 16,
+  },
+  filterChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+    overflow: 'hidden',
+  },
+  filterChipActive: {
+    backgroundColor: 'rgba(15, 44, 71, 0.2)',
+  },
+  filterText: {
+    fontSize: 13,
+    fontWeight: '500',
   },
   content: {
     padding: 8,

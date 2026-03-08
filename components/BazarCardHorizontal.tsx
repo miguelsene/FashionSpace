@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/theme';
@@ -15,7 +15,7 @@ interface BazarCardHorizontalProps {
   location: string;
 }
 
-export default function BazarCardHorizontal({ id, name, rating, image, location }: BazarCardHorizontalProps) {
+const BazarCardHorizontal = memo(({ id, name, rating, image, location }: BazarCardHorizontalProps) => {
   const { isDark } = useTheme();
   const { isFavorite, toggleFavorite } = useFavorites();
   const router = useRouter();
@@ -25,39 +25,36 @@ export default function BazarCardHorizontal({ id, name, rating, image, location 
       style={styles.card}
       onPress={() => router.push(`/bazar/${id}`)}
     >
-      <Image source={{ uri: image }} style={styles.image} />
+      <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
       <TouchableOpacity style={styles.favoriteButton} onPress={() => toggleFavorite(id)}>
         <Ionicons name={isFavorite(id) ? 'heart' : 'heart-outline'} size={20} color="#FF6B9D" />
       </TouchableOpacity>
       
-      <BlurView intensity={60} tint={isDark ? 'dark' : 'light'} style={styles.content}>
+      <View style={[styles.content, { backgroundColor: isDark ? 'rgba(15, 44, 71, 0.8)' : 'rgba(244, 237, 220, 0.8)' }]}>
         <Text style={[styles.name, { color: isDark ? '#f4eddc' : '#000' }]} numberOfLines={1}>{name}</Text>
         <View style={styles.footer}>
           <View style={styles.rating}>
             <Ionicons name="star" size={14} color="#FFD700" />
             <Text style={[styles.ratingText, { color: isDark ? '#f4eddc' : '#000' }]}>{rating.toFixed(1)}</Text>
           </View>
-          <TouchableOpacity onPress={() => router.push(`/bazar/${id}`)}>
-            <Text style={styles.rateText}>Avaliar</Text>
-          </TouchableOpacity>
         </View>
         <View style={styles.location}>
           <Ionicons name="location-outline" size={12} color="#5f81a5" />
           <Text style={[styles.locationText, { color: '#5f81a5' }]} numberOfLines={1}>{location}</Text>
         </View>
-      </BlurView>
+      </View>
     </TouchableOpacity>
   );
-}
+});
+
+export default BazarCardHorizontal;
 
 const styles = StyleSheet.create({
   card: {
     width: 160,
-    borderRadius: 16,
+    borderRadius: 20,
     marginRight: 12,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(95, 129, 165, 0.3)',
     backgroundColor: 'transparent',
   },
   image: {
