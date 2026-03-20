@@ -1,10 +1,26 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+
+const UNREAD_COUNT = 3;
+
+function BadgeIcon({ name, color, size, count }: { name: any; color: string; size: number; count?: number }) {
+  return (
+    <View>
+      <Ionicons name={name} size={size} color={color} />
+      {count && count > 0 ? (
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{count > 9 ? '9+' : count}</Text>
+        </View>
+      ) : null}
+    </View>
+  );
+}
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -52,7 +68,9 @@ export default function TabLayout() {
         name="messages"
         options={{
           title: 'Mensagens',
-          tabBarIcon: ({ color, size }) => <Ionicons name="chatbubbles" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <BadgeIcon name="chatbubbles" color={color} size={size} count={UNREAD_COUNT} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -65,3 +83,23 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -6,
+    backgroundColor: '#FF6B9D',
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 3,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 9,
+    fontWeight: '800',
+  },
+});

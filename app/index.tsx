@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
-import { Redirect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingScreen from '@/components/LoadingScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Index() {
   const { user, isLoading } = useAuth();
@@ -9,17 +10,19 @@ export default function Index() {
 
   useEffect(() => {
     if (!isLoading) {
-      if (user) {
-        router.replace('/(tabs)');
-      } else {
-        router.replace('/login');
-      }
+      (async () => {
+        const done = await AsyncStorage.getItem('onboarding_done');
+        if (!done) {
+          router.replace('/onboarding');
+        } else if (user) {
+          router.replace('/(tabs)');
+        } else {
+          router.replace('/login');
+        }
+      })();
     }
   }, [user, isLoading]);
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-
+  if (isLoading) return <LoadingScreen />;
   return null;
 }

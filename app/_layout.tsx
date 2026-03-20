@@ -7,6 +7,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider as CustomThemeProvider } from '@/contexts/ThemeContext';
 import { FavoritesProvider } from '@/contexts/FavoritesContext';
+import { HistoryProvider } from '@/contexts/HistoryContext';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -15,6 +16,7 @@ export default function RootLayout() {
     <AuthProvider>
       <CustomThemeProvider>
         <FavoritesProvider>
+          <HistoryProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="index" />
@@ -25,10 +27,15 @@ export default function RootLayout() {
               <Stack.Screen name="chat/[id]" />
               <Stack.Screen name="all-bazares" />
               <Stack.Screen name="map" />
+              <Stack.Screen name="privacy" />
+              <Stack.Screen name="notifications" />
+              <Stack.Screen name="address" />
+              <Stack.Screen name="onboarding" />
               <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
             </Stack>
             <StatusBar style="auto" />
           </ThemeProvider>
+          </HistoryProvider>
         </FavoritesProvider>
       </CustomThemeProvider>
     </AuthProvider>

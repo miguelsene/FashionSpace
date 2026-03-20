@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, TextInput, Share } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, TextInput, Share, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -50,6 +50,12 @@ const MOCK_POSTS = [
 export default function FeedScreen() {
   const { isDark } = useTheme();
   const [posts, setPosts] = useState(MOCK_POSTS.map(post => ({ ...post, liked: false, showComments: false, commentText: '' })));
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1200);
+  }, []);
 
   const handleLike = useCallback((postId: string) => {
     setPosts(posts => posts.map(post => 
@@ -108,7 +114,17 @@ export default function FeedScreen() {
           <Ionicons name="notifications-outline" size={24} color={isDark ? '#f4eddc' : '#000'} />
         </BlurView>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#5f81a5"
+              colors={['#5f81a5']}
+            />
+          }
+        >
           {posts.map(post => (
             <BlurView key={post.id} intensity={60} tint={isDark ? 'dark' : 'light'} style={styles.postCard}>
               <View style={styles.postHeader}>
